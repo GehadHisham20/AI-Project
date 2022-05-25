@@ -107,3 +107,32 @@ def parseResultsToGuiFormat(res): #parse solution be one list to display in gui
             resultMatrix[place[i][0]-1][place[i][1]-1]=value[i]
     
     return resultMatrix
+Toka Hefny
+def validate(size, cageList):
+    outOfBounds = lambda xy: xy[0] < 1 or xy[0] > size or xy[1] < 1 or xy[1] > size
+    mentioned = set()
+    for i in range(len(cageList)):
+        members, operator, target = cageList[i]
+        cageList[i] = (tuple(set(members)), operator, target)
+        members, operator, target = cageList[i]
+        
+        if operator not in "+-*/.":
+            print("Operation", operator, "of clique", cageList[i], "is unacceptable", file=stderr)
+            exit(1)
+        problematic = list(filter(outOfBounds, members))
+        
+        if problematic:
+            print("Members", problematic, "of clique", cageList[i], "are out of bounds", file=stderr)
+            exit(2)
+        problematic = mentioned.intersection(set(members))
+        
+        if problematic:
+            print("Members", problematic, "of clique", cageList[i], "are cross referenced", file=stderr)
+            exit(3)
+        mentioned.update(set(members))
+    indexes = range(1, size + 1)
+    problematic = set([(x, y) for y in indexes for x in indexes]).difference(mentioned)
+
+    if problematic:
+        print("Positions", problematic, "were not mentioned in any clique", file=stderr)
+        exit(4)
