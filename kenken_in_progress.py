@@ -162,3 +162,16 @@ ef gdomains(size, cageList):
         qualifies = lambda values: not conflicting(members, values, members, values) and satisfies(values, operation(operator), target)
         domains[members] = list(filter(qualifies, domains[members]))
     return domains
+def gneighbors(cageList):
+    neighbors = {}
+    for members, _, _ in cageList:
+        neighbors[members] = []
+
+    for A, _, _ in cageList:
+        for B, _, _ in cageList:
+            if A != B and B not in neighbors[A]:
+                if conflicting(A, [-1] * len(A), B, [-1] * len(B)):
+                    neighbors[A].append(B)
+                    neighbors[B].append(A)
+
+    return neighbors
