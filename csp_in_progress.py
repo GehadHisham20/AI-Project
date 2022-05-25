@@ -101,3 +101,74 @@ class CSP(Problem):
         return [var for var in self.variables
                 if self.nconflicts(var, current[var], current) > 0]
 
+   def revise(csp, Xi, Xj, removals):
+    revised = False
+    for x in csp.curr_domains[Xi][:]:
+        if all(not csp.constraints(Xi, x, Xj, y) for y in csp.curr_domains[Xj]):
+            csp.prune(Xi, x, removals)
+            revised = True
+    return revised
+
+def first_unassigned_variable(assignment, csp):
+    return first([var for var in csp.variables if var not in assignment])
+
+def unordered_domain_values(var, assignment, csp):
+    return csp.choices(var)
+
+def check(csp, Xi, Xj, removals):
+    checked = False
+    for x in csp.curr_domains[Xi][:]:
+        if all(not csp.constraints(Xi, x, Xj, y) for y in csp.curr_domains[Xj]):
+            csp.prune(Xi, x, removals)
+            checked = True
+    return checked
+
+def ApplyFilter(csp, var, value, assignment, removals,f):
+    if f == "FC":
+        for B in csp.neighbors[var]:
+            if B not in assignment:
+                for b in csp.curr_domains[B][:]:
+                    if not csp.constraints(var, value, B, b):
+                        csp.prune(B, b, removals)
+                if not csp.curr_domains[B]:
+                    return False
+        return True
+    elif f == "AC3":
+        queue = None
+        queue= [(x, var) for x in csp.neighbors[var]]
+        if queue is None:
+            queue = [(Xi, Xk) for Xi in csp.variables for Xk in csp.neighbors[Xi]]
+        csp.support_pruning()
+        while queue:
+            (Xi, Xj) = queue.pop()
+            if check(csp, Xi, Xj, removals):
+                if not csp.curr_domains[Xi]:
+                    return False
+                for Xk in csp.neighbors[Xi]:
+                    if Xk != Xi:
+                        queue.append((Xk, Xi))
+        return True
+
+def BTAlgorithm(csp,filter="None"):
+    def BT(assignment):
+        if len(assignment) == len(csp.variables):
+            return assignment
+        var = first_unassigned_variable(assignment, csp)
+        for value in unordered_domain_values(var, assignment, csp):
+            if 0 == csp.nconflicts(var, value, assignment):
+                csp.assign(var, value, assignment)
+                removals = csp.suppose(var, value)
+                inferences= True
+                if filter != "None":
+                    inferences = ApplyFilter(csp, var, value, assignment, removals, filter)
+                if inferences:
+                    result = BT(assignment)
+                    if result is not None:
+                        return result
+                csp.restore(removals)
+        csp.unassign(var, assignment)
+        return None
+
+    result = BT({})
+    assert result is None or csp.goal_test(result)
+    return result
