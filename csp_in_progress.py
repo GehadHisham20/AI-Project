@@ -1,3 +1,7 @@
+
+def count(seq):
+    return sum(bool(x) for x in seq)
+
 class Problem(object):
     def __init__(self, initial, goal=None):
         self.initial = initial
@@ -8,12 +12,10 @@ class Problem(object):
 
     def value(self, state):
         raise NotImplementedError
-
-   
+        
 class CSP(Problem):
     def __init__(self, variables, domains, neighbors, constraints):
         variables = variables or list(domains.keys())
-
         self.variables = variables
         self.domains = domains
         self.neighbors = neighbors
@@ -21,12 +23,7 @@ class CSP(Problem):
         self.initial = ()
         self.curr_domains = None
         self.nassigns = 0
-    
-    def infer_assignment(self):
-        self.support_pruning()
-        return {v: self.curr_domains[v][0]
-                for v in self.variables if 1 == len(self.curr_domains[v])}
-    
+
     def assign(self, var, val, assignment):
         assignment[var] = val
         self.nassigns += 1
@@ -41,6 +38,22 @@ class CSP(Problem):
                     not self.constraints(var, val, var2, assignment[var2]))
         return count(conflict(v) for v in self.neighbors[var])
 
+    def display(self, assignment):
+        print('CSP:', self, 'with assignment:', assignment)
+
+    def actions(self, state):
+        if len(state) == len(self.variables):
+            return []
+        else:
+            assignment = dict(state)
+            var = first([v for v in self.variables if v not in assignment])
+            return [(var, val) for val in self.domains[var]
+                    if self.nconflicts(var, val, assignment) == 0]
+
+    def result(self, state, action):
+        (var, val) = action
+        return state + ((var, val),)
+
     def goal_test(self, state):
         assignment = dict(state)
         return (len(assignment) == len(self.variables)
@@ -48,7 +61,7 @@ class CSP(Problem):
                         for variables in self.variables))
 
     def support_pruning(self):
-       if self.curr_domains is None:
+        if self.curr_domains is None:
             self.curr_domains = {v: list(self.domains[v]) for v in self.variables}
 
     def suppose(self, var, value):
@@ -63,9 +76,18 @@ class CSP(Problem):
             removals.append((var, value))
 
     def choices(self, var):
-        #Return all values for var that aren't currently ruled out
         return (self.curr_domains or self.domains)[var]
+
+    def infer_assignment(self):
+        self.support_pruning()
+        return {v: self.curr_domains[v][0]
+                for v in self.variables if 1 == len(self.curr_domains[v])}
 
     def restore(self, removals):
         for B, b in removals:
             self.curr_domains[B].append(b)
+
+    def conflicted_vars(self, current):
+        return [var for var in self.variables
+                if self.nconflicts(var, current[var], current) > 0]
+
