@@ -149,3 +149,8 @@ def conflicting(A, a, B, b):
                 return True
 
     return False
+def satisfies(values, operation, target):
+    for p in permutations(values):
+        if reduce(operation, p) == target:
+            return True
+    return False
