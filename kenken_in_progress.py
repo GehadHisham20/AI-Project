@@ -154,3 +154,11 @@ def satisfies(values, operation, target):
         if reduce(operation, p) == target:
             return True
     return False
+ef gdomains(size, cageList):
+    domains = {}
+    for clique in cageList:
+        members, operator, target = clique
+        domains[members] = list(product(range(1, size + 1), repeat=len(members)))
+        qualifies = lambda values: not conflicting(members, values, members, values) and satisfies(values, operation(operator), target)
+        domains[members] = list(filter(qualifies, domains[members]))
+    return domains
