@@ -136,3 +136,5 @@ def validate(size, cageList):
     if problematic:
         print("Positions", problematic, "were not mentioned in any clique", file=stderr)
         exit(4)
+def RowXorCol(xy1, xy2):
+    return (xy1[0] == xy2[0]) != (xy1[1] == xy2[1])
