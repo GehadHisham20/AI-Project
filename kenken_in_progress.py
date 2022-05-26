@@ -107,7 +107,7 @@ def parseResultsToGuiFormat(res): #parse solution be one list to display in gui
             resultMatrix[place[i][0]-1][place[i][1]-1]=value[i]
     
     return resultMatrix
-Toka Hefny
+
 def validate(size, cageList):
     outOfBounds = lambda xy: xy[0] < 1 or xy[0] > size or xy[1] < 1 or xy[1] > size
     mentioned = set()
