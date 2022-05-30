@@ -111,6 +111,9 @@ class GUI(Frame):
         for row in range(len(solution)):  
             for column in range(len(solution)):
                 self.canv.itemconfigure(self.MyPuzzleSolution[row][column], text=solution[row][column]) 
+        #display solving time
+        timeLabel1=Label(self, text="\t\t\nSolving Time: " + str(self.MyPuzzle.getTime()),font=("Arial",10,"bold"),fg="red")
+        timeLabel1.pack()
 
     #close the solver window only
     def close(self, event):
@@ -136,7 +139,7 @@ def main():
         global window
         window = Tk() 
         window.title("KenKen Solver")
-        window.geometry(f"{size*100}x{size*100}")
+        window.geometry(f"{size*300}x{size*300}")
         
         #make scroller
         main_frame=Frame(window)
