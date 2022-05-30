@@ -10,28 +10,28 @@ def setSize_Algorithm(s,a):
     algorithm=a
 
 #--------------------------kenken puzzle---------------------------------
-class KenKen: 
+class MyPuzzle: 
     def __init__(self):
         cageList= generateCages(size)
         output = Kenken(size, cageList)
 
         if(algorithm=='1'):
             Tstart = time.time()
-            self.kenkenSolution=csp.BTAlgorithm(output) 
+            self.MyPuzzleSolution=csp.BTAlgorithm(output) 
             Tend= time.time()
         elif(algorithm=='2'):
             Tstart = time.time()
-            self.kenkenSolution=csp.BTAlgorithm(output, filter="FC")
+            self.MyPuzzleSolution=csp.BTAlgorithm(output, filter="FC")
             Tend= time.time()
         elif(algorithm=='3'):
             Tstart = time.time()
-            self.kenkenSolution=csp.BTAlgorithm(output, filter="AC3")
+            self.MyPuzzleSolution=csp.BTAlgorithm(output, filter="AC3")
             Tend= time.time()
             
         self.SolvingTime = Tend-Tstart
         # prepare outputs to display in GUI
         self.guiCages,self.cages_background = parseCagesToGuiFormat(cageList)
-        self.solutionGui=parseResultsToGuiFormat(self.kenkenSolution)
+        self.solutionGui=parseResultsToGuiFormat(self.MyPuzzleSolution)
         
      #to send result to the gui class
     def getResult(self):
@@ -43,16 +43,16 @@ class KenKen:
 class GUI(Frame):
     def __init__(self, master):
         Frame.__init__(self, master) 
-        self.kenken = KenKen()                   
-        self.guiCages = self.kenken.guiCages 
-        self.cages_background = self.kenken.cages_background   
+        self.MyPuzzle = MyPuzzle()                   
+        self.guiCages = self.MyPuzzle.guiCages 
+        self.cages_background = self.MyPuzzle.cages_background   
         self.canv = Canvas(master, width=size*70, height=size*70)
         self.canv.pack()
         self.secondWindowContent()   
         self.pack()
 
     def secondWindowContent(self):
-        # Display kenken structure in GUI
+        # Display MyPuzzle structure in GUI
         self.canv.create_rectangle(0, 0, size*70,size*70) 
         self.sqlist = []
         itr=0
@@ -76,17 +76,17 @@ class GUI(Frame):
             i+=1
 
         # Display the solution in GUI
-        self.kenkenSolution = [[1 for x in range(size)] for y in range(size)]
+        self.MyPuzzleSolution = [[1 for x in range(size)] for y in range(size)]
         x = 35
         y = 35
-        for m in range(len(self.kenkenSolution)):
-            for n in range(len(self.kenkenSolution)):
-                self.kenkenSolution[m][n] = self.canv.create_text(x, y, font="Arial 20", text = '')
+        for m in range(len(self.MyPuzzleSolution)):
+            for n in range(len(self.MyPuzzleSolution)):
+                self.MyPuzzleSolution[m][n] = self.canv.create_text(x, y, font="Arial 20", text = '')
                 y += 70
             y = 35
             x += 70
         #display time
-        timeLable=Label(self, text=self.kenken.getTime() ,font=("Arial",10,"bold"),fg="red")
+        timeLable=Label(self, text=self.MyPuzzle.getTime() ,font=("Arial",10,"bold"),fg="red")
         timeLable.pack(side = BOTTOM, expand=YES)
 
         #display buttons
@@ -107,10 +107,10 @@ class GUI(Frame):
         
     #display the solution in GUI
     def solve(self, event):
-        solution = self.kenken.getResult()  
+        solution = self.MyPuzzle.getResult()  
         for row in range(len(solution)):  
             for column in range(len(solution)):
-                self.canv.itemconfigure(self.kenkenSolution[row][column], text=solution[row][column]) 
+                self.canv.itemconfigure(self.MyPuzzleSolution[row][column], text=solution[row][column]) 
 
     #close the solver window only
     def close(self, event):
