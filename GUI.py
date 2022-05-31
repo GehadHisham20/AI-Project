@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from kenken import *
 import time
-import psutil
+#import psutil
 
 def setSize_Algorithm(s,a):
     global size
@@ -116,8 +116,8 @@ class GUI(Frame):
         timeLabel1=Label(self, text="\t\t\nSolving Time: " + str(self.MyPuzzle.getTime()),font=("Arial",10,"bold"),fg="red")
         timeLabel1.pack()
         #display cpu utilization
-        Label2=Label(self, text= "CPU utilization: "+str(psutil.cpu_percent(self.MyPuzzle.getTime()))+"%",font=("Arial",10,"bold"),fg="green")
-        Label2.pack()
+#         Label2=Label(self, text= "CPU utilization: "+str(psutil.cpu_percent(self.MyPuzzle.getTime()))+"%",font=("Arial",10,"bold"),fg="green")
+#         Label2.pack()
 
     #close the solver window only
     def close(self, event):
