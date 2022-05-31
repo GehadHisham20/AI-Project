@@ -175,3 +175,20 @@ def gneighbors(cageList):
                     neighbors[B].append(A)
 
     return neighbors
+class Kenken(csp.CSP):
+
+    def _init_(self, size, cageList):
+        validate(size, cageList)
+        variables = [members for members, _, _ in cageList]
+        domains = gdomains(size, cageList)
+        neighbors = gneighbors(cageList)
+        csp.CSP._init_(self, variables, domains, neighbors, self.constraint)
+        self.size = size
+        self.checks = 0
+        self.padding = 0
+        for  target in cageList:
+            self.padding = max(self.padding, len(str(target)))        
+
+    def constraint(self, A, a, B, b):
+        self.checks += 1
+        return A == B or not conflicting(A, a, B, b)
