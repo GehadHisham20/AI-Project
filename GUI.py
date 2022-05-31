@@ -185,5 +185,31 @@ def main():
 if __name__ == "__main__":
     main()
 
+class MyPuzzle: 
+    def _init_(self):
+        cageList= generateCages(size)
+        output = Kenken(size, cageList)
 
+        if(algorithm=='1'):
+            Tstart = time.time()
+            self.MyPuzzleSolution=csp.BTAlgorithm(output) 
+            Tend= time.time()
+        elif(algorithm=='2'):
+            Tstart = time.time()
+            self.MyPuzzleSolution=csp.BTAlgorithm(output, filter="FC")
+            Tend= time.time()
+        elif(algorithm=='3'):
+            Tstart = time.time()
+            self.MyPuzzleSolution=csp.BTAlgorithm(output, filter="AC3")
+            Tend= time.time()
+            
+        self.SolvingTime = Tend-Tstart
+        # prepare outputs to display in GUI
+        self.guiCages,self.cages_background = parseCagesToGuiFormat(cageList)
+        self.solutionGui=parseResultsToGuiFormat(self.MyPuzzleSolution)
+        
+
+    #to send result to the gui class
+    def getResult(self):
+        return self.solutionGui
 
