@@ -1,3 +1,4 @@
+#return the first element
 def first(iterable, default=None):
     try:
         return iterable[0]
@@ -6,9 +7,11 @@ def first(iterable, default=None):
     except TypeError:
         return next(iterable, default)
 
+#compare
 def is_in(elt, seq):
     return any(x is elt for x in seq)
-    
+
+#count the number of true items
 def count(seq):
     return sum(bool(x) for x in seq)
 
@@ -16,13 +19,7 @@ class Problem(object):
     def __init__(self, initial, goal=None):
         self.initial = initial
         self.goal = goal
-
-    def result(self, state, action):
-        raise NotImplementedError
-
-    def value(self, state):
-        raise NotImplementedError
-        
+    
 class CSP(Problem):
     def __init__(self, variables, domains, neighbors, constraints):
         variables = variables or list(domains.keys())
@@ -33,75 +30,60 @@ class CSP(Problem):
         self.initial = ()
         self.curr_domains = None
         self.nassigns = 0
-
+    
+    #add to assignment
     def assign(self, var, val, assignment):
         assignment[var] = val
         self.nassigns += 1
-
+    
+    #remove from assignment
     def unassign(self, var, assignment):
         if var in assignment:
             del assignment[var]
-
+    
+    #return the number of conflicts
     def nconflicts(self, var, val, assignment):
         def conflict(var2):
             return (var2 in assignment and
                     not self.constraints(var, val, var2, assignment[var2]))
         return count(conflict(v) for v in self.neighbors[var])
 
-    def display(self, assignment):
-        print('CSP:', self, 'with assignment:', assignment)
-
-    def actions(self, state):
-        if len(state) == len(self.variables):
-            return []
-        else:
-            assignment = dict(state)
-            var = first([v for v in self.variables if v not in assignment])
-            return [(var, val) for val in self.domains[var]
-                    if self.nconflicts(var, val, assignment) == 0]
-
-    def result(self, state, action):
-        (var, val) = action
-        return state + ((var, val),)
-
+    #assign all variables with all constraints satisfied
     def goal_test(self, state):
         assignment = dict(state)
         return (len(assignment) == len(self.variables)
                 and all(self.nconflicts(variables, assignment[variables], assignment) == 0
                         for variables in self.variables))
-
+    
+    #make sure we prune values from domains
     def support_pruning(self):
         if self.curr_domains is None:
             self.curr_domains = {v: list(self.domains[v]) for v in self.variables}
-
+    
+    #start inferences from assuming var=value
     def suppose(self, var, value):
         self.support_pruning()
         removals = [(var, a) for a in self.curr_domains[var] if a != value]
         self.curr_domains[var] = [value]
         return removals
 
+    #remove var=value
     def prune(self, var, value, removals):
         self.curr_domains[var].remove(value)
         if removals is not None:
             removals.append((var, value))
-
+    
+    #Return all values for var that aren't currently ruled out
     def choices(self, var):
         return (self.curr_domains or self.domains)[var]
-
-    def infer_assignment(self):
-        self.support_pruning()
-        return {v: self.curr_domains[v][0]
-                for v in self.variables if 1 == len(self.curr_domains[v])}
-
+    
+    #undo
     def restore(self, removals):
         for B, b in removals:
             self.curr_domains[B].append(b)
 
-    def conflicted_vars(self, current):
-        return [var for var in self.variables
-                if self.nconflicts(var, current[var], current) > 0]
 
-   def revise(csp, Xi, Xj, removals):
+def revise(csp, Xi, Xj, removals):
     revised = False
     for x in csp.curr_domains[Xi][:]:
         if all(not csp.constraints(Xi, x, Xj, y) for y in csp.curr_domains[Xj]):
@@ -123,6 +105,7 @@ def check(csp, Xi, Xj, removals):
             checked = True
     return checked
 
+#filter function if FC or AC
 def ApplyFilter(csp, var, value, assignment, removals,f):
     if f == "FC":
         for B in csp.neighbors[var]:
@@ -149,6 +132,7 @@ def ApplyFilter(csp, var, value, assignment, removals,f):
                         queue.append((Xk, Xi))
         return True
 
+#Backtracking
 def BTAlgorithm(csp,filter="None"):
     def BT(assignment):
         if len(assignment) == len(csp.variables):
