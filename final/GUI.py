@@ -17,42 +17,14 @@ class MyPuzzle:
         self.output = Kenken(size, cageList)
 
         if(algorithm=='1'):
-                Tstart=time.time()
                 self.MyPuzzleSolution=csp.BTAlgorithm(self.output) 
-                Tend=time.time()
-                #print("BT Time:",Tend-Tstart)
-                #FCstart=time.time()
-                #FC=csp.BTAlgorithm(self.output, filter="FC")
-                #print("FC Time:",time.time()-FCstart)
-                #ACstart=time.time()
-                #AC=csp.BTAlgorithm(self.output, filter="AC3")
-                #print("AC Time:",time.time()-ACstart)
-
+ 
         elif(algorithm=='2'):
-            Tstart=time.time()
             self.MyPuzzleSolution=csp.BTAlgorithm(self.output, filter="FC")
-            Tend=time.time()
-            # print("FC Time:",Tend-Tstart)
-            # FCstart=time.time()
-            # FC=csp.BTAlgorithm(self.output)
-            # print("BT Time:",time.time()-FCstart)
-            # ACstart=time.time()
-            # AC=csp.BTAlgorithm(self.output, filter="AC3")
-            # print("AC Time:",time.time()-ACstart)
 
         elif(algorithm=='3'):
-                Tstart=time.time()
-                self.MyPuzzleSolution=csp.BTAlgorithm(self.output, filter="AC3")
-                Tend=time.time()   
-                # print("AC Time:",Tend-Tstart)
-                # FCstart=time.time()
-                # FC=csp.BTAlgorithm(self.output, filter="FC")
-                # print("FC Time:",time.time()-FCstart)
-                # ACstart=time.time()
-                # AC=csp.BTAlgorithm(self.output)
-                # print("BT Time:",time.time()-ACstart)      
-        
-        self.SolvingTime=Tend-Tstart    
+                self.MyPuzzleSolution=csp.BTAlgorithm(self.output, filter="AC3")       
+          
         # prepare outputs to display in GUI
         self.guiCages,self.cages_background = parseCagesToGuiFormat(cageList)
         self.solutionGui=parseResultsToGuiFormat(self.MyPuzzleSolution)
@@ -61,8 +33,6 @@ class MyPuzzle:
     def getResult(self):
         return self.solutionGui
 
-    def getTime(self):
-        return self.SolvingTime   
 
 class GUI(Frame):
     def __init__(self, master):
@@ -132,9 +102,7 @@ class GUI(Frame):
         for row in range(len(solution)):  
             for column in range(len(solution)):
                 self.canv.itemconfigure(self.MyPuzzleSolution[row][column], text=solution[row][column])
-        #display solving time
-        timeLabel1=Label(self, text="\t\t\nSolving Time: " + str(self.MyPuzzle.getTime()),font=("Arial",10,"bold"),fg="red")
-        timeLabel1.pack()
+
 
     #close the solver window only
     def close(self, event):
@@ -190,7 +158,7 @@ def main():
         global window
         window = Tk() 
         window.title("KenKen Solver")
-        window.geometry(f"{size*300}x{size*300}")
+        window.geometry(f"{size*100}x{size*100}")
         
         #make scroller
         main_frame=Frame(window)
