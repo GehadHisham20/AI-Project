@@ -123,16 +123,20 @@ def calculateTime(generatedoutput,f):
 
 def boardGenerator():
     lines = []
-
     for i in range(100):
+        print("\nitr",i+1)
         lines.append("----------------Board "+str(i+1)+"--------------------")
         generatedSize=randint(3,8)
         generatedcageList= generateCages(generatedSize)
         generatedoutput = Kenken(generatedSize, generatedcageList)
         lines.append("Size = "+str(generatedSize))
+        print("Size:",generatedSize)
         lines.append("BT Time: "+str(calculateTime(generatedoutput, "none")))
+        print("BT Done")   
         lines.append("FC Time: "+str(calculateTime(generatedoutput, "FC")))
-        lines.append("AC Time:"+str(calculateTime(generatedoutput, "AC3")))  
+        print("FC Done")
+        lines.append("AC Time:"+str(calculateTime(generatedoutput, "AC3")))
+        print("AC3 Done") 
 
     with open('performance.txt', 'w') as f:
         f. truncate(0)
